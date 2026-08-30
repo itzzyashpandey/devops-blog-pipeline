@@ -26,7 +26,7 @@ defaults:
 social:
   github: "https://github.com/itzzyashpandey"
   linkedin: "https://linkedin.com/in/yashpandey1272000"
-  coffee: "https://buymeacoffee.com/yourusername"
+  coffee: "https://buymeacoffee.com/yourusernam"
 
 exclude:
   - Gemfile
