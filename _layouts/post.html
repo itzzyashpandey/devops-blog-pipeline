@@ -1,0 +1,46 @@
+---
+layout: default
+---
+{% assign total = site.posts | size %}
+{% assign idx = 0 %}
+{% for p in site.posts %}
+  {% if p.url == page.url %}
+    {% assign idx = forloop.index0 %}
+  {% endif %}
+{% endfor %}
+{% assign auto_run = total | minus: idx %}
+{% assign run_number = page.run | default: auto_run %}
+{% assign status = page.status | default: "passed" %}
+{% assign words = content | strip_html | number_of_words %}
+{% assign read_time = words | divided_by: 200 | at_least: 1 %}
+
+<article class="post">
+
+  {% if page.image %}
+  <div class="post-hero">
+    <img src="{{ page.image | relative_url }}" alt="{{ page.title }}">
+  </div>
+  {% endif %}
+
+  <div class="run-meta mono">
+    <span class="dot dot-{{ status }}" aria-hidden="true"></span>
+    <span>run #{{ run_number }}</span>
+    <span class="sep">·</span>
+    <span>{{ status }}</span>
+    <span class="sep">·</span>
+    <span>{{ page.date | date: "%b %d, %Y" }}</span>
+    <span class="sep">·</span>
+    <span>{{ read_time }} min read</span>
+    {% if page.topic %}
+    <span class="sep">·</span>
+    <span class="topic-tag">{{ page.topic }}</span>
+    {% endif %}
+  </div>
+
+  <h1 class="post-title">{{ page.title }}</h1>
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+</article>
