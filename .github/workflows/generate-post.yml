@@ -84,10 +84,65 @@ jobs:
               ].join("\n")
             });
 
+  generate-content:
+    needs: parse-topic
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compute run number
+        id: run_number
+        run: |
+          count=$(ls -1 _posts/*.md 2>/dev/null | wc -l)
+          echo "value=$((count + 1))" >> "$GITHUB_OUTPUT"
+
+      - name: Generate post with Gemini
+        id: generate
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TOPIC: ${{ needs.parse-topic.outputs.topic }}
+          CATEGORY: ${{ needs.parse-topic.outputs.category }}
+          ANGLE: ${{ needs.parse-topic.outputs.angle }}
+          SLUG: ${{ needs.parse-topic.outputs.slug }}
+          RUN_NUMBER: ${{ steps.run_number.outputs.value }}
+        run: python3 scripts/generate_post.py
+
+      - name: Upload draft as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: draft-post
+          path: _posts/*.md
+          if-no-files-found: error
+
+      - name: Comment draft summary on issue
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ needs.parse-topic.outputs.issue_number }}
+          POST_TITLE: ${{ steps.generate.outputs.post_title }}
+        with:
+          script: |
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+            const title = process.env.POST_TITLE;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body: [
+                "✅ **Draft generated.**",
+                "",
+                `**Title:** ${title}`,
+                "",
+                "_Download it from this workflow run's Artifacts section to preview. Publishing straight to the blog lands in Phase 5._"
+              ].join("\n")
+            });
+
   # ---- Future phases plug in here as additional jobs ----
-  # generate-content:
-  #   needs: parse-topic
-  #   ...uses needs.parse-topic.outputs.topic, .category, .angle, .slug
   # generate-image:
   #   needs: generate-content
   #   ...
