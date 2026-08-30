@@ -1,0 +1,98 @@
+name: Daily Post Pipeline
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  parse-topic:
+    # Only run for issues opened by the repo owner, carrying the "new-post" label.
+    # This stops random public users from triggering the pipeline on a public repo.
+    if: >
+      github.event.issue.user.login == github.repository_owner &&
+      contains(github.event.issue.labels.*.name, 'new-post')
+    runs-on: ubuntu-latest
+    outputs:
+      topic: ${{ steps.extract.outputs.topic }}
+      category: ${{ steps.extract.outputs.category }}
+      angle: ${{ steps.extract.outputs.angle }}
+      slug: ${{ steps.extract.outputs.slug }}
+      issue_number: ${{ github.event.issue.number }}
+    steps:
+      - name: Extract fields from issue form
+        id: extract
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || "";
+
+            function extractField(label) {
+              const regex = new RegExp(`### ${label}\\s*\\n\\s*([\\s\\S]*?)(?=\\n### |$)`, "i");
+              const match = body.match(regex);
+              return match ? match[1].trim() : "";
+            }
+
+            const topic = extractField("Topic");
+            const category = extractField("Category");
+            const angleRaw = extractField("Angle or notes \\(optional\\)");
+            const angle = angleRaw && angleRaw !== "_No response_" ? angleRaw : "None provided";
+
+            const slug = topic
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/(^-|-$)/g, "")
+              .slice(0, 60);
+
+            if (!topic) {
+              core.setFailed("Could not find a Topic field in the issue body.");
+              return;
+            }
+
+            core.setOutput("topic", topic);
+            core.setOutput("category", category);
+            core.setOutput("angle", angle);
+            core.setOutput("slug", slug);
+
+      - name: Acknowledge on the issue
+        uses: actions/github-script@v7
+        env:
+          TOPIC: ${{ steps.extract.outputs.topic }}
+          CATEGORY: ${{ steps.extract.outputs.category }}
+          ANGLE: ${{ steps.extract.outputs.angle }}
+        with:
+          script: |
+            const topic = process.env.TOPIC;
+            const category = process.env.CATEGORY;
+            const angle = process.env.ANGLE;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                "🚀 **Pipeline triggered.**",
+                "",
+                `**Topic:** ${topic}`,
+                `**Category:** ${category}`,
+                `**Angle:** ${angle}`,
+                "",
+                "_Drafting the post next — this comment thread will update as each stage completes. (Content generation lands in Phase 3.)_"
+              ].join("\n")
+            });
+
+  # ---- Future phases plug in here as additional jobs ----
+  # generate-content:
+  #   needs: parse-topic
+  #   ...uses needs.parse-topic.outputs.topic, .category, .angle, .slug
+  # generate-image:
+  #   needs: generate-content
+  #   ...
+  # publish-blog:
+  #   needs: generate-image
+  #   ...
+  # post-linkedin:
+  #   needs: publish-blog
+  #   ...
+  # archive-to-repo:
+  #   needs: publish-blog
+  #   ...

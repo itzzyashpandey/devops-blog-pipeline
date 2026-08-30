@@ -1,0 +1,37 @@
+name: "📝 New Blog Post"
+description: "Trigger the daily blog pipeline with a topic"
+title: "[Post]: "
+labels: ["new-post"]
+body:
+  - type: input
+    id: topic
+    attributes:
+      label: Topic
+      description: "What should today's post be about?"
+      placeholder: 'e.g. "Why everyone is suddenly talking about eBPF"'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - DevOps
+        - AI
+        - Cloud
+        - Kubernetes
+        - Programming
+        - Career
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: angle
+    attributes:
+      label: "Angle or notes (optional)"
+      description: "Any specific angle, opinion, or points you want covered?"
+      placeholder: "e.g. Focus on why this matters for small teams, not enterprises"
+    validations:
+      required: false
