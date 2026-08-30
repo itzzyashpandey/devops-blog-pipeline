@@ -1,8 +1,8 @@
-title: "Your Name — Tech, DevOps & AI Notes"
+title: "Yash Pandey — Tech, DevOps, Cloud & AI Blogs"
 description: "Daily dispatches on tech, DevOps, and AI — written by a human, shipped by a pipeline."
-url: "https://yourusername.github.io"
+url: "https://itzzyashpandey.github.io"
 baseurl: "/devops-blog-pipeline"
-author: "Your Name"
+author: "Yash Pandey"
 
 markdown: kramdown
 kramdown:
@@ -24,8 +24,8 @@ defaults:
 
 # Used in the footer — update these once
 social:
-  github: "https://github.com/yourusername"
-  linkedin: "https://linkedin.com/in/yourusername"
+  github: "https://github.com/itzzyashpandey"
+  linkedin: "https://linkedin.com/in/yashpandey1272000"
   coffee: "https://buymeacoffee.com/yourusername"
 
 exclude:
