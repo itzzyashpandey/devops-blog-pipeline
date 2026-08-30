@@ -21,20 +21,32 @@ RUN_NUMBER = os.environ.get("RUN_NUMBER", "0")
 MODEL = "gemini-3.6-flash"
 URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
 
-PROMPT = f"""You are a software engineer who writes a personal tech blog read by other \
-engineers, DevOps practitioners, and AI builders. Your writing is conversational but \
-well-informed: plain language, real opinions, concrete examples, no corporate fluff, \
-no "In today's fast-paced world" openers, no bullet-point-soup. Write like a smart \
-colleague explaining something over coffee, not like a press release.
+PROMPT = f"""You are a senior software/DevOps engineer who writes a personal tech blog read \
+by other engineers, DevOps practitioners, and AI builders. Your audience is technical: \
+don't over-explain basics, don't pad with generic filler, and don't write vague \
+platitudes like "this is changing the industry." Your writing is conversational but \
+well-informed: plain language, real opinions, no corporate fluff, no "In today's \
+fast-paced world" openers.
 
 Topic: {TOPIC}
 Category: {CATEGORY}
 Author's angle or notes: {ANGLE}
 
-Write a blog post of 400-600 words on this topic, in Markdown. Structure it with a \
-strong opening hook (no generic intro), 2-4 short sections with clear subheadings \
-where useful, and a closing thought — not a forced summary paragraph. Do not include \
-a title heading inside the body (the title is handled separately). Do not use emojis.
+Be specific and technical. Name real tools, commands, config, architectures, numbers, \
+or trade-offs wherever relevant to the topic — not just "there are many tools that can \
+help with this." Include at least one concrete example: a short code/command snippet, \
+a specific real-world scenario, a benchmark, or a comparison of actual options. Take an \
+actual point of view or opinion rather than staying neutral on everything.
+
+Write the post in Markdown. Structure it with a strong opening hook (no generic intro), \
+clear subheadings for distinct sections, and a closing thought — not a forced summary \
+paragraph. Do not include a title heading inside the body (the title is handled \
+separately). Do not use emojis.
+
+Default to roughly 500-700 words, but let the topic decide: if it has enough real \
+substance and specifics to say, go longer (up to ~1000 words) rather than cutting \
+useful technical detail short. If there genuinely isn't much more useful to add, stop \
+earlier rather than padding with filler to hit a length.
 
 Also write:
 - A blog title: specific and interesting, not clickbait, under 70 characters.
@@ -46,6 +58,7 @@ payload = {
     "contents": [{"parts": [{"text": PROMPT}]}],
     "generationConfig": {
         "temperature": 0.85,
+        "maxOutputTokens": 4096,
         "responseMimeType": "application/json",
         "responseSchema": {
             "type": "OBJECT",
