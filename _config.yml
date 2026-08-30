@@ -1,0 +1,36 @@
+title: "Your Name — Tech, DevOps & AI Notes"
+description: "Daily dispatches on tech, DevOps, and AI — written by a human, shipped by a pipeline."
+url: "https://yourusername.github.io"
+baseurl: "/devops-blog-pipeline"
+author: "Your Name"
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+permalink: /:year/:month/:day/:title/
+
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+# Used in the footer — update these once
+social:
+  github: "https://github.com/yourusername"
+  linkedin: "https://linkedin.com/in/yourusername"
+  coffee: "https://buymeacoffee.com/yourusername"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules
+  - vendor
