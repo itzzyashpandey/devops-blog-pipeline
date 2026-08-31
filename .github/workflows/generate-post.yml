@@ -166,7 +166,6 @@ jobs:
       - name: Generate thumbnail image
         id: image
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TOPIC: ${{ needs.parse-topic.outputs.topic }}
           CATEGORY: ${{ needs.parse-topic.outputs.category }}
           POST_TITLE: ${{ needs.generate-content.outputs.post_title }}
@@ -180,7 +179,7 @@ jobs:
           path: |
             _posts/*.md
             assets/images/*.png
-          if-no-files-found: error
+          if-no-files-found: warn
 
       - name: Comment image summary on issue
         uses: actions/github-script@v7
@@ -191,15 +190,22 @@ jobs:
           script: |
             const issue_number = Number(process.env.ISSUE_NUMBER);
             const source = process.env.IMAGE_SOURCE;
+            const body = source === "none"
+              ? [
+                  "⚠️ **Thumbnail generation failed** after retries — the post will publish without a hero image this time.",
+                  "",
+                  "_Check the `generate-image` job logs if this keeps happening._"
+                ].join("\n")
+              : [
+                  `🖼️ **Thumbnail generated** (source: ${source}).`,
+                  "",
+                  "_Download `draft-post-with-image` from this run's Artifacts to preview post + image together. Publishing to the live blog lands in Phase 5._"
+                ].join("\n");
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number,
-              body: [
-                `🖼️ **Thumbnail generated** (source: ${source}).`,
-                "",
-                "_Download `draft-post-with-image` from this run's Artifacts to preview post + image together. Publishing to the live blog lands in Phase 5._"
-              ].join("\n")
+              body
             });
 
   # ---- Future phases plug in here as additional jobs ----
