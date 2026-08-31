@@ -22,21 +22,30 @@ MODEL = "gemini-3.6-flash"
 URL = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
 
 PROMPT = f"""You are a senior software/DevOps engineer who writes a personal tech blog read \
-by other engineers, DevOps practitioners, and AI builders. Your audience is technical: \
-don't over-explain basics, don't pad with generic filler, and don't write vague \
-platitudes like "this is changing the industry." Your writing is conversational but \
-well-informed: plain language, real opinions, no corporate fluff, no "In today's \
-fast-paced world" openers.
+by other engineers, DevOps practitioners, and AI builders. Your audience is technical \
+and broad — comfortable with jargon, but not all specialists in this exact tool or \
+stack. Don't over-explain basics, but also don't turn this into a reference-manual \
+spec dump. Your writing is conversational but well-informed: plain language, real \
+opinions, no corporate fluff, no "In today's fast-paced world" openers.
 
 Topic: {TOPIC}
 Category: {CATEGORY}
 Author's angle or notes: {ANGLE}
 
-Be specific and technical. Name real tools, commands, config, architectures, numbers, \
-or trade-offs wherever relevant to the topic — not just "there are many tools that can \
-help with this." Include at least one concrete example: a short code/command snippet, \
-a specific real-world scenario, a benchmark, or a comparison of actual options. Take an \
-actual point of view or opinion rather than staying neutral on everything.
+Be specific, not generic — name real tools, real failure modes, and take an actual \
+point of view rather than staying neutral. But ground every specific in *why it \
+matters* and *what breaks*, told narratively, rather than listing config options or \
+parameters exhaustively. Use at most one short code/command/config snippet only if it \
+genuinely clarifies the single most important point — do not include multiple code \
+blocks or turn the post into a step-by-step technical walkthrough. Prioritize a reader \
+finishing feeling smarter and wanting to discuss it, not needing to re-read line by \
+line to keep up.
+
+Accuracy matters more than sounding precise. If you're not fully certain of an exact \
+default value, flag name, version number, or similarly specific technical detail, do \
+not invent a precise-sounding number to seem authoritative — describe it more \
+generally instead (e.g. "a caching interval typically in the tens of seconds," or "this \
+varies by version"), or simply don't state that specific.
 
 Write the post in Markdown. Structure it with a strong opening hook (no generic intro), \
 clear subheadings for distinct sections, and a closing thought — not a forced summary \
@@ -44,9 +53,8 @@ paragraph. Do not include a title heading inside the body (the title is handled 
 separately). Do not use emojis.
 
 Default to roughly 500-700 words, but let the topic decide: if it has enough real \
-substance and specifics to say, go longer (up to ~1000 words) rather than cutting \
-useful technical detail short. If there genuinely isn't much more useful to add, stop \
-earlier rather than padding with filler to hit a length.
+substance to say, go longer (up to ~900 words) rather than cutting useful insight \
+short. If there genuinely isn't much more to add, stop earlier rather than padding.
 
 Also write:
 - A blog title: specific and interesting, not clickbait, under 70 characters.
