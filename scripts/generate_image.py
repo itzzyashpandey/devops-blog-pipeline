@@ -21,25 +21,36 @@ CATEGORY = os.environ.get("CATEGORY", "Tech")
 POST_TITLE = os.environ.get("POST_TITLE", TOPIC)
 SLUG = os.environ["SLUG"]
 
-# The referrer Pollinations uses to identify legitimate traffic — set to
-# your site's own domain. Safe to hardcode since it's public information.
 REFERRER = os.environ.get("SITE_REFERRER", "itzzyashpandey.github.io")
 
-# Matches the blog's actual CSS design tokens, so generated thumbnails feel
-# like part of one consistent site rather than random stock-art per post.
 STYLE = (
-    "Minimalist abstract editorial illustration for a tech blog. "
-    "Dark ink-navy background, warm amber as the primary accent color, "
-    "muted sage-green as a secondary accent used sparingly. Clean geometric "
-    "shapes, subtle grid or circuit-like linework, conceptual and abstract "
-    "rather than literal or photographic. No text, no words, no letters, no "
-    "logos anywhere in the image. No photographic human faces. Professional "
-    "and modern, suitable as a blog header image."
+    "Flat, bold, vector-style tech editorial illustration, in the style of "
+    "modern SaaS/tech blog headers (think Stripe, Linear, or Vercel blog "
+    "illustrations) — NOT a painterly or photorealistic image. "
+    "Solid dark navy background. The illustrated subject is rendered "
+    "mainly in warm amber/orange, with a small amount of muted teal-green "
+    "as a secondary accent. Simple flat shapes with clean edges and solid "
+    "fills, not blurry gradients or glowing effects. Generous negative "
+    "space around a single, clear, centered subject — readable even at a "
+    "small thumbnail size. "
+    "Avoid: vague abstract blobs, nebulous glowing orbs or spheres, random "
+    "wireframe lines with no clear subject, anything that doesn't clearly "
+    "depict a real object or scene. No text, no words, no letters, no "
+    "logos, no photographic human faces."
 )
 
 PROMPT = (
-    f"{STYLE} The concept this image should evoke: \"{POST_TITLE}\" — a "
-    f"topic in the {CATEGORY} space. Specifically about: {TOPIC}."
+    f"{STYLE}\n\n"
+    f"First, think of ONE concrete visual metaphor that represents this "
+    f"specific topic — a real object or scene, like a gear, a broken "
+    f"chart, scaling arrows, a server rack, a magnifying glass over code, "
+    f"a tangled vs untangled cable, connected nodes, a bottleneck in a "
+    f"pipe, etc. Pick whichever single object or scene best captures the "
+    f"idea below. Then illustrate ONLY that one object/scene, large and "
+    f"centered, in the flat editorial style described above.\n\n"
+    f"Blog post title: \"{POST_TITLE}\"\n"
+    f"Category: {CATEGORY}\n"
+    f"What the post is actually about: {TOPIC}"
 )
 
 today = date.today().isoformat()
