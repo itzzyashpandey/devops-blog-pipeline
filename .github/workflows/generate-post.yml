@@ -87,6 +87,9 @@ jobs:
   generate-content:
     needs: parse-topic
     runs-on: ubuntu-latest
+    outputs:
+      post_title: ${{ steps.generate.outputs.post_title }}
+      post_path: ${{ steps.generate.outputs.post_path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -142,10 +145,64 @@ jobs:
               ].join("\n")
             });
 
+  generate-image:
+    needs: [parse-topic, generate-content]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Download draft post
+        uses: actions/download-artifact@v4
+        with:
+          name: draft-post
+          path: .
+
+      - name: Generate thumbnail image
+        id: image
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TOPIC: ${{ needs.parse-topic.outputs.topic }}
+          CATEGORY: ${{ needs.parse-topic.outputs.category }}
+          POST_TITLE: ${{ needs.generate-content.outputs.post_title }}
+          SLUG: ${{ needs.parse-topic.outputs.slug }}
+        run: python3 scripts/generate_image.py
+
+      - name: Upload draft with image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: draft-post-with-image
+          path: |
+            _posts/*.md
+            assets/images/*.png
+          if-no-files-found: error
+
+      - name: Comment image summary on issue
+        uses: actions/github-script@v7
+        env:
+          ISSUE_NUMBER: ${{ needs.parse-topic.outputs.issue_number }}
+          IMAGE_SOURCE: ${{ steps.image.outputs.image_source }}
+        with:
+          script: |
+            const issue_number = Number(process.env.ISSUE_NUMBER);
+            const source = process.env.IMAGE_SOURCE;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body: [
+                `🖼️ **Thumbnail generated** (source: ${source}).`,
+                "",
+                "_Download `draft-post-with-image` from this run's Artifacts to preview post + image together. Publishing to the live blog lands in Phase 5._"
+              ].join("\n")
+            });
+
   # ---- Future phases plug in here as additional jobs ----
-  # generate-image:
-  #   needs: generate-content
-  #   ...
   # publish-blog:
   #   needs: generate-image
   #   ...
