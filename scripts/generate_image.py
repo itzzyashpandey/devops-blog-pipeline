@@ -130,4 +130,3 @@ if gh_output:
     with open(gh_output, "a", encoding="utf-8") as f:
         f.write(f"image_path={image_path}\n")
         f.write(f"image_source={source}\n")
-SCRIPT_EOF
